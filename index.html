@@ -129,6 +129,8 @@ h1 em{color:var(--green);font-style:normal;}
 footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text-dim);}
 footer a{color:var(--blue);text-decoration:none;}
 footer a:hover{color:var(--green);}
+.callout a,.dl-warning a{color:var(--blue);text-decoration:none;border-bottom:1px dotted rgba(61,158,255,.45);transition:color .15s,border-color .15s;}
+.callout a:hover,.dl-warning a:hover{color:var(--green);border-bottom-color:var(--green);}
 </style>
 </head>
 <body>
@@ -361,31 +363,30 @@ footer a:hover{color:var(--green);}
   </div>
 
   <!-- DOWNLOADS -->
-  <div class="dl-section">
+  <div class="dl-section" id="downloads">
     <div class="dl-title">Automation Scripts</div>
-    <div class="dl-sub">Run as Administrator before and after every session. The pre-launch script is a template — you'll need to fill in three values specific to your system. The guide explains exactly how to find each one.</div>
+    <div class="dl-sub">Run as Administrator before and after every session. <strong>pre_iracing_launch.bat</strong> is the script you use, but it refuses to run until it's been given three values specific to your system. Download <strong>find_my_values.bat</strong> into the same folder and run it first — it writes those values to <strong>my_values.bat</strong>, which <strong>pre_iracing_launch.bat</strong> loads automatically; the guide explains each value.</div>
     <div class="dl-grid">
+      <div class="dl-card">
+        <div class="dl-card-top">
+          <div class="dl-icon">🔍</div>
+          <div class="dl-card-info">
+            <div class="dl-card-name">find_my_values.bat <span style="font-size:11px;color:var(--blue);font-weight:normal;">[SETUP]</span></div>
+            <div class="dl-card-desc">Run once during setup — read-only, changes nothing. Writes my_values.bat (next to itself) with the three values pre_iracing_launch.bat needs: your NVIDIA VEN/DEV path + device instances, driver version, and AMD Ryzen Balanced power-plan GUID.</div>
+          </div>
+        </div>
+        <a href="find_my_values.bat" class="btn btn-download" download><span class="btn-icon">⬇</span>Download .bat</a>
+      </div>
       <div class="dl-card">
         <div class="dl-card-top">
           <div class="dl-icon">⚙️</div>
           <div class="dl-card-info">
-            <div class="dl-card-name">pre_iracing_launch.bat <span style="font-size:11px;color:var(--green);font-weight:normal;">[TEMPLATE]</span></div>
+            <div class="dl-card-name">pre_iracing_launch.bat <span style="font-size:11px;color:var(--green);font-weight:normal;">[MAIN SCRIPT]</span></div>
             <div class="dl-card-desc">Run before every session. Disables background services, Defender real-time monitoring, HAGS, Game Mode, and USB Suspend. Disables MSI mode + applies NVIDIA interrupt affinity to all device instances. Sets AMD Ryzen Balanced power plan. Verifies monitors at max refresh rate.</div>
           </div>
         </div>
-        <div class="dl-warning">⚠ Customize 3 values before use: AMD Ryzen Balanced GUID, NVIDIA device instance IDs, NVIDIA driver version string — see guide Section 05</div>
-        <a href="pre_iracing_launch.bat" class="btn btn-download" download><span class="btn-icon">⬇</span>Download template</a>
-      </div>
-      <div class="dl-card">
-        <div class="dl-card-top">
-          <div class="dl-icon">📋</div>
-          <div class="dl-card-info">
-            <div class="dl-card-name">pre_iracing_launch_example.bat <span style="font-size:11px;color:var(--amber);font-weight:normal;">[EXAMPLE]</span></div>
-            <div class="dl-card-desc">Real example with actual values filled in — shows what the template looks like fully configured for a Ryzen 7800X3D + RTX 4090 system. Do not run this directly — use it as a reference when filling in your own values.</div>
-          </div>
-        </div>
-        <div class="dl-warning">⚠ Do not run as-is — these values are for a specific machine. Use as a reference alongside the template</div>
-        <a href="pre_iracing_launch_example.bat" class="btn btn-download" download><span class="btn-icon">⬇</span>Download example</a>
+        <div class="dl-warning">⚠ Won't run until your values are filled in: run find_my_values.bat in the same folder first (auto-loaded) or see guide <a href="guide.html#s5">Section 05</a></div>
+        <a href="pre_iracing_launch.bat" class="btn btn-download" download><span class="btn-icon">⬇</span>Download .bat</a>
       </div>
       <div class="dl-card">
         <div class="dl-card-top">
@@ -403,7 +404,7 @@ footer a:hover{color:var(--green);}
 
   <div class="callout info">
     <span class="ci">ℹ</span>
-    <span>Start with the <strong>template</strong> — it has placeholders and instructions for finding your three system-specific values (AMD GUID, NVIDIA instance IDs, driver version string). Use the <strong>example</strong> to see what filled-in values look like. Guide Section 05 walks through finding each value.</span>
+    <span>Download <a href="#downloads"><strong>find_my_values.bat</strong></a> into the same folder as <strong>pre_iracing_launch.bat</strong> and run it first — it writes your three system-specific values (AMD GUID, NVIDIA instance IDs, driver version string) to my_values.bat, which <strong>pre_iracing_launch.bat</strong> loads automatically. No copy/paste needed. <a href="guide.html#s5">Guide Section 05</a> explains each value.</span>
   </div>
 
 </div>

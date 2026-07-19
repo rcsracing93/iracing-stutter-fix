@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+# Batch files must stay CRLF: cmd.exe's goto/call label-seeking is
+# documented to be unreliable on LF-only batch files (it executes
+# fine line-by-line, but can intermittently fail to find a label,
+# e.g. "The system cannot find the batch label specified").
+*.bat text eol=crlf
+*.cmd text eol=crlf

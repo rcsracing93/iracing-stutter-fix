@@ -12,8 +12,9 @@ color 0A
 :: https://rcsracing93.github.io/iracing-stutter-fix/guide.html
 ::
 :: HOW TO USE THIS TEMPLATE:
-:: Search for "=== CUSTOMIZE" to find the three values you must
-:: replace with your own. Everything else runs as-is.
+:: Run find_my_values.bat once, in this same folder -- it writes
+:: my_values.bat, which is auto-loaded below. Everything else runs
+:: as-is. (No my_values.bat? Fill in the CONFIG block by hand instead.)
 :: ================================================================
 
 net session >nul 2>&1
@@ -23,6 +24,57 @@ if %errorlevel% neq 0 (
     exit /b
 )
 echo [OK]   Running as Administrator
+
+:: ================================================================
+:: ============================ CONFIG ============================
+:: These are fallback defaults, only used if my_values.bat is not
+:: found next to this script (see below). Run find_my_values.bat to
+:: generate that file instead of editing these by hand.
+:: ================================================================
+:: 1) AMD Ryzen Balanced power plan GUID   (find: powercfg /list)
+set "POWER_GUID=YOUR-AMD-RYZEN-BALANCED-GUID"
+:: 2) NVIDIA GPU VEN/DEV path -- the part AFTER ...\Enum\PCI\
+set "NV_VENDEV=YOUR-GPU-VEN-DEV-PATH"
+:: 3) NVIDIA device instances -- one "quoted" entry each, space-separated.
+::    Add/remove entries to match how many your GPU has (usually 2-4).
+set NV_INSTANCES="YOUR_INSTANCE_1" "YOUR_INSTANCE_2"
+:: 4) Expected NVIDIA driver version string
+set "NV_DRIVER=YOUR-DRIVER-VERSION"
+:: ================================================================
+
+:: Auto-load machine-specific values from my_values.bat if present
+:: (written by find_my_values.bat into the same folder). Overrides
+:: the CONFIG block above so nothing has to be copy/pasted by hand.
+if exist "%~dp0my_values.bat" (
+    call "%~dp0my_values.bat"
+    echo [OK]   Loaded values from my_values.bat
+) else (
+    echo [WARN] my_values.bat not found - using values from the CONFIG block above. Run find_my_values.bat to generate it.
+)
+
+:: Refuse to run with placeholder values left over from the CONFIG
+:: block - applying them would silently do nothing useful (or fail)
+:: instead of telling you the setup step was skipped.
+set "_BAD_CONFIG="
+if "!POWER_GUID!"=="YOUR-AMD-RYZEN-BALANCED-GUID" set "_BAD_CONFIG=1"
+if "!NV_VENDEV!"=="YOUR-GPU-VEN-DEV-PATH" set "_BAD_CONFIG=1"
+if "!NV_DRIVER!"=="YOUR-DRIVER-VERSION" set "_BAD_CONFIG=1"
+if not "!NV_INSTANCES:YOUR_INSTANCE=!"=="!NV_INSTANCES!" set "_BAD_CONFIG=1"
+if defined _BAD_CONFIG (
+    color 0C
+    echo.
+    echo ============================================================
+    echo   [FAIL] CONFIG values are still placeholders - not running.
+    echo.
+    echo   Run find_my_values.bat in this same folder, then re-run
+    echo   this script - it auto-loads the values from my_values.bat.
+    echo   Or fill in the CONFIG block above by hand: see guide
+    echo   Section 05 - NVIDIA values, or Section 06 - power-plan GUID.
+    echo ============================================================
+    echo.
+    pause
+    exit /b 1
+)
 
 :: Pending reboot check
 reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" >nul 2>&1
@@ -112,20 +164,9 @@ taskkill /IM "Claude.exe" /F >nul 2>&1
 taskkill /IM "claude-desktop.exe" /F >nul 2>&1
 echo [OK]   Claude closed
 
-:: ================================================================
-:: === CUSTOMIZE 1 of 3: AMD Ryzen Balanced Power Plan GUID ===
-::
-:: To find your GUID, run in admin PowerShell:
-::   powercfg /list
-:: Look for "AMD Ryzen Balanced" in the list.
-:: If it doesn't exist, create it:
-::   powercfg /duplicatescheme e4041c28-a933-4db9-9e7a-7a9a87c65676
-:: Then run powercfg /list again to get the new GUID.
-::
-:: Replace YOUR-AMD-RYZEN-BALANCED-GUID below with your value:
-:: ================================================================
-powercfg /setactive YOUR-AMD-RYZEN-BALANCED-GUID >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Power plan set to AMD Ryzen Balanced) else (echo [WARN] Could not set AMD Ryzen Balanced - check GUID in Section 06 of guide)
+:: Power plan -- AMD Ryzen Balanced (POWER_GUID is set in CONFIG at top)
+powercfg /setactive %POWER_GUID% >nul 2>&1
+if %errorlevel%==0 (echo [OK]   Power plan set to AMD Ryzen Balanced) else (echo [WARN] Could not set AMD Ryzen Balanced - check POWER_GUID in CONFIG / guide Section 06)
 
 :: Process Lasso check
 tasklist | find /i "ProcessLasso.exe" >nul 2>&1
@@ -137,48 +178,40 @@ if %errorlevel%==0 (
     timeout /t 3 /nobreak >nul
 )
 
-:: Monitor refresh rate check - must be at max Hz
-for /f "tokens=*" %%a in ('powershell -command "(Get-WmiObject Win32_VideoController | Where-Object {$_.Name -like '*NVIDIA*'}).CurrentRefreshRate" 2^>nul') do set MONHZ=%%a
-if defined MONHZ (
-    if !MONHZ! GEQ 230 (
-        echo [OK]   Monitor refresh rate: !MONHZ! Hz
+:: Monitor refresh rate check - compares current Hz against the GPU-
+:: reported max for the active mode (catches monitors that reset to a
+:: lower Hz after sleep/reboot). Auto-detected every run, no setup
+:: needed. Allows a 5Hz tolerance since drivers sometimes report 1-2
+:: Hz under a panel's rated rate even while truly at max.
+set "MONHZ="
+set "MAXHZ="
+for /f "tokens=1,2" %%a in ('powershell -NoProfile -ExecutionPolicy Bypass -command "$ErrorActionPreference='SilentlyContinue'; $d=Get-CimInstance Win32_VideoController | Where-Object {$_.Name -like '*NVIDIA*'} | Select-Object -First 1; if($d -and $d.MaxRefreshRate){Write-Output ($d.CurrentRefreshRate.ToString()+' '+$d.MaxRefreshRate.ToString())}" 2^>nul') do (
+    set "MONHZ=%%a"
+    set "MAXHZ=%%b"
+)
+set "_REFRESH_DETECTED="
+if defined MONHZ if defined MAXHZ if !MAXHZ! GTR 0 set "_REFRESH_DETECTED=1"
+if defined _REFRESH_DETECTED (
+    set /a "_MIN_REFRESH_HZ=!MAXHZ!-5"
+    if !MONHZ! GEQ !_MIN_REFRESH_HZ! (
+        echo [OK]   Monitor refresh rate: !MONHZ! Hz ^(max detected: !MAXHZ! Hz^)
     ) else (
         color 0C
-        echo [FAIL] Monitor refresh rate: !MONHZ! Hz
+        echo [FAIL] Monitor refresh rate: !MONHZ! Hz - below detected max ^(!MAXHZ! Hz^)
         echo        Fix: Settings ^> System ^> Display ^> Advanced display ^> refresh rate
         echo        Set ALL monitors to max Hz, then re-run this script
         pause
         color 0A
     )
 ) else (
-    echo [WARN] Could not check monitor refresh rate
+    echo [WARN] Could not auto-detect monitor refresh rate - skipping check
 )
 
-:: ================================================================
-:: === CUSTOMIZE 2 of 3: NVIDIA Device Instance IDs ===
-::
-:: Each system has 2-5 device instances for the same GPU.
-:: Windows alternates between them on each reboot, so ALL must
-:: be set. Run this in Command Prompt to find yours:
-::
-::   wmic path Win32_PnPEntity where "Name like '%NVIDIA%'" get DeviceID,Name
-::
-:: Look for your GPU model. The instance suffix is the part after
-:: the last backslash: e.g. 4&1babdf5b&0&0009
-::
-:: You also need your GPU's VEN/DEV path. Run:
-::   reg query "HKLM\System\CurrentControlSet\Enum\PCI" /s /k | findstr /i "VEN_10DE"
-:: Find the path containing your GPU's device ID.
-::
-:: Replace the NV path and instance IDs below:
-:: ================================================================
-set "NV=HKLM\System\CurrentControlSet\Enum\PCI\YOUR-GPU-VEN-DEV-PATH"
-
-call :nvidia_affinity YOUR_INSTANCE_1
-call :nvidia_affinity YOUR_INSTANCE_2
-call :nvidia_affinity YOUR_INSTANCE_3
-call :nvidia_affinity YOUR_INSTANCE_4
-:: Add more lines above if wmic shows additional instances (some systems have 5+)
+:: NVIDIA MSI disable + interrupt affinity to CPU 7. NV_VENDEV and
+:: NV_INSTANCES are set in CONFIG at the top. The loop applies the fix
+:: to every instance; the quotes keep the & in each instance ID literal.
+set "NV=HKLM\System\CurrentControlSet\Enum\PCI\%NV_VENDEV%"
+for %%I in (%NV_INSTANCES%) do call :nvidia_affinity %%I
 
 echo [OK]   NVIDIA interrupt affinity set to CPU 7 on all instances
 
@@ -199,20 +232,10 @@ goto :after_exclusions
 echo [OK]   Defender exclusion checks skipped - monitoring suspended
 :after_exclusions
 
-:: ================================================================
-:: === CUSTOMIZE 3 of 3: NVIDIA driver version string ===
-::
-:: This checks that your driver hasn't changed since you last
-:: verified your GoInterruptPolicy settings. Get your version:
-::
-::   wmic path Win32_VideoController where "Name like '%NVIDIA%'" get DriverVersion
-::
-:: Replace YOUR-DRIVER-VERSION below. Update this value after
-:: every driver install.
-:: ================================================================
+:: NVIDIA driver version check (NV_DRIVER is set in CONFIG at top)
 for /f "tokens=*" %%a in ('powershell -command "(Get-WmiObject Win32_VideoController | Where-Object {$_.Name -like '*NVIDIA*'}).DriverVersion" 2^>nul') do set NVDRIVER=%%a
 if defined NVDRIVER (
-    if "!NVDRIVER!"=="YOUR-DRIVER-VERSION" (echo [OK]   NVIDIA driver confirmed: !NVDRIVER!) else (echo [WARN] NVIDIA driver changed: !NVDRIVER! - re-verify GoInterruptPolicy settings after driver updates)
+    if "!NVDRIVER!"=="%NV_DRIVER%" (echo [OK]   NVIDIA driver confirmed: !NVDRIVER!) else (echo [WARN] NVIDIA driver changed: !NVDRIVER! - re-verify GoInterruptPolicy settings after driver updates)
 ) else (echo [WARN] Could not read NVIDIA driver version)
 
 :: Final wuauserv check
@@ -239,7 +262,7 @@ reg add "!_BASE!\MessageSignaledInterruptProperties" /v MSISupported /t REG_DWOR
 reg add "!_BASE!\Affinity Policy" /v DevicePolicy /t REG_DWORD /d 4 /f >nul 2>&1
 reg add "!_BASE!\Affinity Policy" /v AssignmentSetOverride /t REG_BINARY /d 8000000000000000 /f >nul 2>&1
 reg add "!_BASE!\Affinity Policy" /v DevicePriority /t REG_DWORD /d 3 /f >nul 2>&1
-if !errorlevel!==0 (echo [OK]   NVIDIA MSI disabled + affinity CPU7: %~1) else (echo [WARN] Could not set: %~1)
+if !errorlevel!==0 (echo [OK]   NVIDIA MSI disabled + affinity CPU7: "%~1") else (echo [WARN] Could not set: "%~1")
 exit /b
 
 :: ---------------------------------------------------------------
@@ -248,8 +271,8 @@ exit /b
 powershell -command "$p=(Get-MpPreference).ExclusionPath; if ($p -contains '!_DP!') { exit 0 } else { exit 1 }" >nul 2>&1
 if !errorlevel!==1 (
     powershell -command "Add-MpPreference -ExclusionPath '!_DP!'" >nul 2>&1
-    if !errorlevel!==0 (echo [FIXED] Defender exclusion added: !_DL!) else (echo [FAIL]  Could not add exclusion: !_DP!)
-) else (echo [OK]    Defender exclusion: !_DL!)
+    if !errorlevel!==0 (echo [FIXED] Defender exclusion added: "!_DL!") else (echo [FAIL]  Could not add exclusion: "!_DP!")
+) else (echo [OK]    Defender exclusion: "!_DL!")
 exit /b
 
 :: Subroutine: check and auto-add Defender process exclusion
@@ -257,6 +280,6 @@ exit /b
 powershell -command "$p=(Get-MpPreference).ExclusionProcess; if ($p -contains '!_DC!') { exit 0 } else { exit 1 }" >nul 2>&1
 if !errorlevel!==1 (
     powershell -command "Add-MpPreference -ExclusionProcess '!_DC!'" >nul 2>&1
-    if !errorlevel!==0 (echo [FIXED] Defender process exclusion added: !_DC!) else (echo [FAIL]  Could not add: !_DC!)
-) else (echo [OK]    Defender exclusion: !_DC! ^(process^))
+    if !errorlevel!==0 (echo [FIXED] Defender process exclusion added: "!_DC!") else (echo [FAIL]  Could not add: "!_DC!")
+) else (echo [OK]    Defender exclusion: "!_DC!" ^(process^))
 exit /b

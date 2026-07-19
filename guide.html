@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iRacing Stutter Fix — AMD Ryzen X3D + NVIDIA Complete Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Sans:wght@0,400;0,500;0,600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0a0c10;--bg2:#10141c;--bg3:#181d28;--bg4:#0d1018;
@@ -27,7 +27,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 15% 50%,#00e5a010,transparent 70%),radial-gradient(ellipse 50% 70% at 85% 20%,#3d9eff0a,transparent 70%);pointer-events:none;}
 .hero-inner{max-width:960px;margin:0 auto;position:relative;}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.25rem;padding:4px 12px;border:1px solid rgba(0,229,160,.3);border-radius:2px;}
-h1{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;color:var(--text-hi);line-height:1.05;letter-spacing:-.025em;margin-bottom:.875rem;}
+h1{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;color:var(--text-hi);line-height:1.05;letter-spacing:-.025em;margin-bottom:.875rem;}
 h1 em{color:var(--green);font-style:normal;}
 .hero-sub{font-size:16px;color:var(--text-dim);max-width:640px;margin-bottom:1.5rem;line-height:1.6;}
 .hw-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;}
@@ -181,6 +181,23 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
 
 /* COPY BUTTON BEHAVIOR */
 .copied{color:var(--green)!important;}
+
+/* ANCHOR LINKS */
+.section,h3,h4{scroll-margin-top:1.25rem;}
+.anchor-link{opacity:0;margin-left:.45em;color:var(--text-dim);text-decoration:none;font-weight:400;transition:opacity .15s,color .15s;}
+.anchor-link:hover{color:var(--green);}
+.section-title:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1;}
+h3:target,h4:target,.section:target .section-title{color:var(--green);}
+
+/* SMOOTH SCROLL + NAV */
+html{scroll-behavior:smooth;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;transition:color .15s;}
+.back-link:hover{color:var(--green);}
+#toTop{position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s,color .15s,border-color .15s;z-index:50;}
+#toTop:hover{color:var(--green);border-color:var(--green);}
+#toTop.show{opacity:1;pointer-events:auto;}
+a.xref{color:var(--blue);text-decoration:none;border-bottom:1px dotted rgba(61,158,255,.45);transition:color .15s,border-color .15s;}
+a.xref:hover{color:var(--green);border-bottom-color:var(--green);}
 </style>
 </head>
 <body>
@@ -188,6 +205,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
+    <a href="index.html" class="back-link">← Overview &amp; downloads</a>
     <div class="hero-tag">Community Troubleshooting Guide</div>
     <h1>iRacing <em>Stutter Fix</em><br>AMD Ryzen X3D + NVIDIA</h1>
     <p class="hero-sub">A field-tested guide to diagnosing and eliminating frame time spikes in iRacing on AMD Ryzen 7000/9000 X3D systems with NVIDIA GPUs. Based on 24+ CapFrameX capture sessions and extensive LatencyMon analysis — not theoretical.</p>
@@ -243,26 +261,26 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <div class="dt-node">
       <div class="dt-q">Do you have stutters in iRacing?</div>
       <div class="dt-answers">
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Yes, it feels like a brief freeze or hitch → <span class="dt-action">Install CapFrameX and capture a session first (Section 01)</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Not sure if it's a stutter or normal corner-specific slowdown → <span class="dt-action">Check if it happens at the same corner every lap. If yes, capture it. If random, go to Section 01.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Yes, it feels like a brief freeze or hitch → <span class="dt-action">Install CapFrameX and capture a session first (<a class="xref" href="#s1">Section 01</a>)</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Not sure if it's a stutter or normal corner-specific slowdown → <span class="dt-action">Check if it happens at the same corner every lap. If yes, capture it. If random, go to <a class="xref" href="#s1">Section 01</a>.</span></span></div>
       </div>
     </div>
     <div class="dt-node">
       <div class="dt-q">In your CapFrameX capture, look at the spike frame. What do you see?</div>
       <div class="dt-answers">
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Frame BEFORE the spike has GPU active time 20ms+</strong>, spike frame CPU is low (~3ms) → <span class="dt-action">Type A — GPU scene complexity. Go to Section 02.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Spike frame CPU is 15–30ms</strong>, GPU is fine (~3–4ms), no preceding frame anomaly → <span class="dt-action">Type B — CPU sim thread preemption. Go to Sections 03, 04, 05.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Both CPU and GPU are fine on the spike frame</strong> (~3–5ms each), no preceding anomaly → <span class="dt-action">Present queue stall — likely NVIDIA DPC or overlay interference. Go to Sections 03D and 05.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Hard pagefaults over 10,000 in LatencyMon → <span class="dt-action">Background services running. Go to Section 04.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Frame BEFORE the spike has GPU active time 20ms+</strong>, spike frame CPU is low (~3ms) → <span class="dt-action">Type A — GPU scene complexity. Go to <a class="xref" href="#s2">Section 02</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Spike frame CPU is 15–30ms</strong>, GPU is fine (~3–4ms), no preceding frame anomaly → <span class="dt-action">Type B — CPU sim thread preemption. Go to Sections <a class="xref" href="#s3">03</a>, <a class="xref" href="#s4">04</a>, <a class="xref" href="#s5">05</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>Both CPU and GPU are fine on the spike frame</strong> (~3–5ms each), no preceding anomaly → <span class="dt-action">Present queue stall — likely NVIDIA DPC or overlay interference. Go to Sections <a class="xref" href="#s3d">03D</a> and <a class="xref" href="#s5">05</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Hard pagefaults over 10,000 in LatencyMon → <span class="dt-action">Background services running. Go to <a class="xref" href="#s4">Section 04</a>.</span></span></div>
       </div>
     </div>
     <div class="dt-node">
       <div class="dt-q">LatencyMon — where are your interrupts going?</div>
       <div class="dt-answers">
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>CPU 0 DPC total is over 15s per 5 minutes</strong>, all other CPUs near zero → <span class="dt-action">NVIDIA interrupt affinity problem. Go to Section 05.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is tiworker.exe or wuauserv → <span class="dt-action">Windows Update running during session. Go to Section 04.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is rtss.exe or capframex.exe → <span class="dt-action">RivaTuner Statistics Server interference. Go to Section 03D.</span></span></div>
-        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is msmpeng.exe → <span class="dt-action">Windows Defender scanning iRacing. Go to Section 04.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text"><strong>CPU 0 DPC total is over 15s per 5 minutes</strong>, all other CPUs near zero → <span class="dt-action">NVIDIA interrupt affinity problem. Go to <a class="xref" href="#s5">Section 05</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is tiworker.exe or wuauserv → <span class="dt-action">Windows Update running during session. Go to <a class="xref" href="#s4">Section 04</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is rtss.exe or capframex.exe → <span class="dt-action">RivaTuner Statistics Server interference. Go to <a class="xref" href="#s3d">Section 03D</a>.</span></span></div>
+        <div class="dt-a"><span class="dt-arrow">→</span><span class="dt-text">Top pagefaulting process is msmpeng.exe → <span class="dt-action">Windows Defender scanning iRacing. Go to <a class="xref" href="#s4">Section 04</a>.</span></span></div>
       </div>
     </div>
   </div>
@@ -284,7 +302,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <div class="step"><div class="step-body"><strong>Disable the RTSS overlay</strong> — in CapFrameX → Options → Overlay, uncheck "Show overlay." RivaTuner Statistics Server (which powers the overlay) adds 50,000+ hard pagefaults per session and can cause its own stutters. The JSON capture works fine without the overlay.</div></div>
     <div class="step"><div class="step-body"><strong>Uninstall RTSS and MSI Afterburner if present</strong> — even with the overlay disabled, RTSS hooks into DirectX and causes background interference. Settings → Apps → uninstall both. CapFrameX capture works without them.</div></div>
     <div class="step"><div class="step-body"><strong>In iRacing, complete at least one full lap before starting capture</strong> — the first 30–60 seconds of a session include initialization noise. Start your capture after the first corner sequence to get clean data.</div></div>
-    <div class="step"><div class="step-body"><strong>After the session, upload the JSON file here</strong> or open it in CapFrameX to view frame times. Look for frames over 12ms (at a 164fps cap, target is 6.1ms — anything over 2× target is a spike you'd feel).</div></div>
+    <div class="step"><div class="step-body"><strong>After the session, open the JSON capture in CapFrameX</strong> to view frame times. Look for frames over 12ms (at a 164fps cap, target is 6.1ms — anything over 2× target is a spike you'd feel).</div></div>
   </div>
 
   <h3>LatencyMon — Kernel Interrupt Analysis</h3>
@@ -294,19 +312,19 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <div class="step"><div class="step-body"><strong>Run LatencyMon as Administrator</strong> while iRacing is running. Alt-Tab out of iRacing, start LatencyMon, click Play.</div></div>
     <div class="step"><div class="step-body"><strong>Drive for at least 5 minutes</strong> through your problem corners with LatencyMon running in the background. Less than 2 minutes gives unreliable results.</div></div>
     <div class="step"><div class="step-body"><strong>Check the Drivers tab</strong> sorted by "Highest DPC execution time" — the top entry is your primary offender. On NVIDIA systems this is usually nvlddmkm.sys or dxgkrnl.sys.</div></div>
-    <div class="step"><div class="step-body"><strong>Check Per CPU data</strong> — if CPU 0 shows 10× more DPC work than all other cores combined, you have an interrupt affinity problem (Section 05).</div></div>
+    <div class="step"><div class="step-body"><strong>Check Per CPU data</strong> — if CPU 0 shows 10× more DPC work than all other cores combined, you have an interrupt affinity problem (<a class="xref" href="#s5">Section 05</a>).</div></div>
     <div class="step"><div class="step-body"><strong>Check hard pagefaults</strong> — over 5,000 total per session is elevated. Over 20,000 indicates a background service running. Check which process is listed as the top pagefaulter.</div></div>
   </div>
 
   <h4>Reading LatencyMon results</h4>
   <table class="st">
     <tr><th>Finding</th><th>Meaning</th><th>Action</th></tr>
-    <tr><td class="sk">nvlddmkm.sys highest DPC</td><td class="sn">NVIDIA kernel driver DPC too long</td><td class="sn">Section 05 — interrupt affinity</td></tr>
-    <tr><td class="sk">dxgkrnl.sys highest DPC</td><td class="sn">DirectX kernel — often follows NVIDIA fix or overlay hooks</td><td class="sn">Section 03D — remove RTSS/overlays</td></tr>
-    <tr><td class="sk">CPU 0 dominates ISR/DPC</td><td class="sn">All interrupts on iRacing's core</td><td class="sn">Section 05 — interrupt affinity</td></tr>
-    <tr><td class="sk">tiworker.exe pagefaults</td><td class="sn">Windows Update running mid-session</td><td class="sn">Section 04 — disable services</td></tr>
-    <tr><td class="sk">msmpeng.exe pagefaults</td><td class="sn">Defender scanning iRacing files</td><td class="sn">Section 04 — add exclusions</td></tr>
-    <tr><td class="sk">rtss.exe pagefaults</td><td class="sn">RivaTuner Statistics Server</td><td class="sn">Section 03D — uninstall RTSS</td></tr>
+    <tr><td class="sk">nvlddmkm.sys highest DPC</td><td class="sn">NVIDIA kernel driver DPC too long</td><td class="sn"><a class="xref" href="#s5">Section 05</a> — interrupt affinity</td></tr>
+    <tr><td class="sk">dxgkrnl.sys highest DPC</td><td class="sn">DirectX kernel — often follows NVIDIA fix or overlay hooks</td><td class="sn"><a class="xref" href="#s3d">Section 03D</a> — remove RTSS/overlays</td></tr>
+    <tr><td class="sk">CPU 0 dominates ISR/DPC</td><td class="sn">All interrupts on iRacing's core</td><td class="sn"><a class="xref" href="#s5">Section 05</a> — interrupt affinity</td></tr>
+    <tr><td class="sk">tiworker.exe pagefaults</td><td class="sn">Windows Update running mid-session</td><td class="sn"><a class="xref" href="#s4">Section 04</a> — disable services</td></tr>
+    <tr><td class="sk">msmpeng.exe pagefaults</td><td class="sn">Defender scanning iRacing files</td><td class="sn"><a class="xref" href="#s4">Section 04</a> — add exclusions</td></tr>
+    <tr><td class="sk">rtss.exe pagefaults</td><td class="sn">RivaTuner Statistics Server</td><td class="sn"><a class="xref" href="#s3d">Section 03D</a> — uninstall RTSS</td></tr>
     <tr><td class="sk">iracingui.exe pagefaults</td><td class="sn">iRacing UI browser open during session</td><td class="sn">Close the iRacing launcher during racing</td></tr>
   </table>
 </div>
@@ -507,6 +525,8 @@ Add-MpPreference -ExclusionPath "$env:USERPROFILE\Documents\iRacing"</div>
 
   <div class="callout unique"><span class="ci">🔧</span><span><strong>Device-specific values ahead.</strong> The GPU device instance identifiers in this section are unique to each computer. You must find your own values — do not copy the example values from this guide or the example bat file.</span></div>
 
+  <div class="callout info"><span class="ci">ℹ</span><span><strong>Shortcut:</strong> rather than running the commands below by hand, download <a class="xref" href="index.html#downloads">find_my_values.bat</a> and run it — it prints your VEN/DEV path, all device instances, NVIDIA driver version, and AMD power-plan GUID in one go (read-only). The manual steps below are kept so you can see what it reads.</span></div>
+
   <h3>Step 1 — Find Your GPU Device Instances</h3>
   <p>Run in <strong>Administrator Command Prompt</strong>:</p>
   <div class="code-wrap">
@@ -563,7 +583,7 @@ reg add "HKLM\System\CurrentControlSet\Enum\PCI\YOUR_VEN_DEV_PATH\YOUR_INSTANCE\
   </div>
 
   <h3>Automate with Pre-Launch Script</h3>
-  <p>The pre-launch script (Section 08) applies MSI disable and affinity to all instances before every session. This handles reboot rotation and driver update resets automatically — you don't need to think about it.</p>
+  <p>The pre-launch script (<a class="xref" href="#s8">Section 08</a>) applies MSI disable and affinity to all instances before every session. This handles reboot rotation and driver update resets automatically — you don't need to think about it.</p>
 
   <h3>Verify It's Working</h3>
   <p>Run LatencyMon during iRacing. In Per CPU Data:</p>
@@ -615,7 +635,7 @@ powercfg /setactive YOUR-GUID
 powercfg /list</div>
   </div>
 
-  <div class="callout unique"><span class="ci">🔧</span><span>The GUID generated will be unique to your system. Save it — you'll need it in the pre-launch script (Section 08) and if you ever reimage.</span></div>
+  <div class="callout unique"><span class="ci">🔧</span><span>The GUID generated will be unique to your system. Save it — you'll need it in the pre-launch script (<a class="xref" href="#s8">Section 08</a>) and if you ever reimage.</span></div>
 </div>
 
 <hr class="divider">
@@ -642,7 +662,7 @@ powercfg /list</div>
   </table>
 
   <h3>Power Profile in Process Lasso</h3>
-  <p>Options → Power → Active Power Profile → <strong>AMD Ryzen Balanced</strong> (the plan created in Section 06)</p>
+  <p>Options → Power → Active Power Profile → <strong>AMD Ryzen Balanced</strong> (the plan created in <a class="xref" href="#s6">Section 06</a>)</p>
 </div>
 
 <hr class="divider">
@@ -651,116 +671,35 @@ powercfg /list</div>
 <div class="section" id="s8">
   <div class="section-label"><span class="section-num">08</span><span class="section-title">Pre-Launch Automation Script</span><span class="stag stag-green">AUTOMATION</span></div>
 
-  <p>This script automates everything that needs to happen before each session. Save as <span class="path">pre_iracing_launch.bat</span> and always run as Administrator before iRacing.</p>
+  <p>This script applies every per-session change in one shot — disabling MSI mode and pinning GPU interrupts to CPU 7 on all instances, stopping background services, suspending Defender, setting the power plan, and more. You configure it once, then run it before each session.</p>
 
-  <div class="callout unique"><span class="ci">🔧</span><span>This script contains values specific to one system that you must update: <strong>(1)</strong> The AMD Ryzen Balanced GUID — replace with your own from Section 06. <strong>(2)</strong> Your NVIDIA device instance IDs — find yours by running the wmic command in Section 05. Most systems have 2–4 instances; add a block for each one. <strong>(3)</strong> The expected NVIDIA driver version string.</span></div>
+  <h4>Setup — do this once</h4>
+  <div class="steps">
+    <div class="step"><div class="step-body"><strong>Download both scripts</strong> from the <a class="xref" href="index.html#downloads">downloads section</a> — <code>pre_iracing_launch.bat</code> (the template) and <code>find_my_values.bat</code> — into the <strong>same folder</strong>.</div></div>
+    <div class="step"><div class="step-body"><strong>Run <code>find_my_values.bat</code> as Administrator.</strong> It reads your system (changing nothing) and writes <code>my_values.bat</code> next to itself, filled in with your power-plan GUID, NVIDIA VEN/DEV path, device instances, and driver version.</div></div>
+    <div class="step"><div class="step-body">That's it — <code>pre_iracing_launch.bat</code> auto-loads <code>my_values.bat</code> on every run, so there's nothing to copy or paste. If a value shows up as <code>YOUR-…</code> it couldn't be detected; find it manually via <a class="xref" href="#s5">Section 05</a> (NVIDIA values) or <a class="xref" href="#s6">Section 06</a> (power-plan GUID), then edit <code>my_values.bat</code> directly, keeping the same quoting.</div></div>
+  </div>
 
   <div class="code-wrap">
-    <div class="code-label"><span>pre_iracing_launch.bat — update highlighted values before use</span><span class="cl-copy" onclick="copyCode(this)">Copy</span></div>
-    <div class="code-block">@echo off
-setlocal EnableDelayedExpansion
-title iRacing Pre-Launch Optimizer
-color 0A
+    <div class="code-label"><span>pre_iracing_launch.bat — the CONFIG block (fallback only, used if my_values.bat is missing)</span><span class="cl-copy" onclick="copyCode(this)">Copy</span></div>
+    <div class="code-block"><span class="cc">:: ============================ CONFIG ============================</span>
+<span class="cc">:: 1) AMD Ryzen Balanced power plan GUID   (find: powercfg /list)</span>
+set "POWER_GUID=<span class="ch">YOUR-AMD-RYZEN-BALANCED-GUID</span>"
+<span class="cc">:: 2) NVIDIA GPU VEN/DEV path -- the part AFTER ...\Enum\PCI\</span>
+set "NV_VENDEV=<span class="ch">YOUR-GPU-VEN-DEV-PATH</span>"
+<span class="cc">:: 3) NVIDIA device instances -- one "quoted" entry each, space-separated</span>
+set NV_INSTANCES=<span class="ch">"YOUR_INSTANCE_1" "YOUR_INSTANCE_2"</span>
+<span class="cc">:: 4) Expected NVIDIA driver version string</span>
+set "NV_DRIVER=<span class="ch">YOUR-DRIVER-VERSION</span>"
+<span class="cc">:: ===============================================================</span></div>
+  </div>
+  <div class="callout warn"><span class="ci">⚠</span><span><strong>If editing by hand:</strong> keep the exact quoting shown above. The NVIDIA values contain literal <code>&amp;</code> characters (e.g. <code>VEN_10DE&amp;DEV_2782&amp;...</code>), and cmd.exe only treats <code>&amp;</code> as literal text when it's wrapped in real double quotes exactly like this — single quotes, missing quotes, or a value split across two lines will make cmd read each <code>&amp;</code> as a command separator and fail with "is not recognized as an internal or external command". <code>my_values.bat</code> is generated with the correct quoting automatically, which is why it's the recommended path.</span></div>
+  <div class="callout info"><span class="ci">ℹ</span><span>The monitor refresh-rate check below needs no configuration — it reads your GPU's reported max Hz for the active mode itself, every run, and compares your current Hz against it (5Hz tolerance, since drivers sometimes report 1-2 Hz under a panel's rated rate even at true max — e.g. a 165Hz monitor reporting 164Hz).</span></div>
 
-net session >nul 2>&1
-if %errorlevel% neq 0 (color 0C & echo [FAIL] Run as Administrator & pause & exit /b 1)
-echo [OK]   Running as Administrator
-
-<span class="cc">:: Pending reboot check</span>
-reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" >nul 2>&1
-if %errorlevel%==0 (echo [WARN] Pending Windows reboot) else (echo [OK]   No pending reboot)
-
-<span class="cc">:: Disable Xbox Game Bar</span>
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f >nul 2>&1
-echo [OK]   Xbox Game Bar disabled
-
-<span class="cc">:: -------------------------------------------------------</span>
-<span class="cc">:: NVIDIA interrupt affinity — set on ALL device instances</span>
-<span class="cc">:: Windows alternates instances on each reboot so set all</span>
-<span class="cc">:: AssignmentSetOverride 8000000000000000 = CPU 7 (bitmask 0x80, byte 0)</span>
-<span class="cc">:: UPDATE: replace the three instance IDs with YOUR values</span>
-<span class="cc">:: -------------------------------------------------------</span>
-set NV=HKLM\System\CurrentControlSet\Enum\PCI\VEN_10DE^&DEV_2684^&SUBSYS_88EF1043^&REV_A1
-
-<span class="ch">:: === CUSTOMIZE: replace YOUR_INSTANCE_N with your values (find via wmic command in Section 05) ===</span>
-<span class="cc">:: Most systems have 2-4 instances. Apply to all of them — Windows alternates on reboot.</span>
-<span class="cc">:: Run: wmic path Win32_PnPEntity where "Name like '%NVIDIA%'" get DeviceID,Name</span>
-
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_1</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePolicy /t REG_DWORD /d 4 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_1</span>\Device Parameters\Interrupt Management\Affinity Policy" /v AssignmentSetOverride /t REG_BINARY /d 8000000000000000 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_1</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePriority /t REG_DWORD /d 3 /f >nul 2>&1
-
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_2</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePolicy /t REG_DWORD /d 4 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_2</span>\Device Parameters\Interrupt Management\Affinity Policy" /v AssignmentSetOverride /t REG_BINARY /d 8000000000000000 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_2</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePriority /t REG_DWORD /d 3 /f >nul 2>&1
-
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_3</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePolicy /t REG_DWORD /d 4 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_3</span>\Device Parameters\Interrupt Management\Affinity Policy" /v AssignmentSetOverride /t REG_BINARY /d 8000000000000000 /f >nul 2>&1
-reg add "%NV%\<span class="ch">YOUR_INSTANCE_3</span>\Device Parameters\Interrupt Management\Affinity Policy" /v DevicePriority /t REG_DWORD /d 3 /f >nul 2>&1
-
-<span class="cc">:: Add more blocks above if wmic shows additional instances</span>
-echo [OK]   NVIDIA interrupt affinity applied to all instances (CPU 7)
-
-<span class="cc">:: -------------------------------------------------------</span>
-<span class="cc">:: DISABLE services so they cannot restart mid-session</span>
-<span class="cc">:: -------------------------------------------------------</span>
-sc config wuauserv start= disabled >nul 2>&1 & sc stop wuauserv >nul 2>&1
-sc query wuauserv | find "STOPPED" >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Windows Update disabled) else (echo [WARN] Windows Update may still be running)
-
-sc config UsoSvc start= disabled >nul 2>&1 & sc stop UsoSvc >nul 2>&1
-echo [OK]   Update Orchestrator disabled
-
-sc config WSearch start= disabled >nul 2>&1 & sc stop WSearch >nul 2>&1
-sc query WSearch | find "STOPPED" >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Windows Search disabled) else (echo [WARN] Windows Search may still be running)
-
-<span class="cc">:: Stop (not disable) remaining services</span>
-sc query SysMain | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop SysMain >nul 2>&1 & echo [OK]   SysMain stopped) else (echo [OK]   SysMain already stopped)
-sc query Spooler | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop Spooler >nul 2>&1 & echo [OK]   Spooler stopped) else (echo [OK]   Spooler already stopped)
-sc query WlanSvc | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop WlanSvc >nul 2>&1 & echo [OK]   WiFi stopped) else (echo [OK]   WiFi already stopped)
-sc query bthserv | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop BthAvctpSvc >nul 2>&1 & sc stop BTAGService >nul 2>&1 & sc stop bthserv >nul 2>&1 & echo [OK]   Bluetooth stopped) else (echo [OK]   Bluetooth already stopped)
-sc query XblAuthManager | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop XblAuthManager >nul 2>&1 & echo [OK]   Xbox Live stopped) else (echo [OK]   Xbox Live already stopped)
-
-<span class="cc">:: Backblaze — if installed</span>
-sc query bzserv >nul 2>&1
-if %errorlevel%==0 (sc query bzserv | find "RUNNING" >nul 2>&1 & if !errorlevel!==0 (sc stop bzserv >nul 2>&1 & echo [OK]   Backblaze stopped) else (echo [OK]   Backblaze already stopped))
-
-<span class="cc">:: -------------------------------------------------------</span>
-<span class="cc">:: Power plan — UPDATE with your AMD Ryzen Balanced GUID</span>
-<span class="cc">:: -------------------------------------------------------</span>
-powercfg /setactive <span class="ch">YOUR-AMD-RYZEN-BALANCED-GUID</span> >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Power plan set to AMD Ryzen Balanced) else (echo [WARN] Could not set power plan - check GUID)
-
-<span class="cc">:: Process Lasso check</span>
-tasklist | find /i "ProcessLasso.exe" >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Process Lasso running) else (echo [WARN] Process Lasso not running)
-
-<span class="cc">:: Defender exclusion check</span>
-powershell -command "if ((Get-MpPreference).ExclusionPath -contains 'C:\Program Files (x86)\iRacing') { exit 0 } else { exit 1 }" >nul 2>&1
-if %errorlevel%==0 (echo [OK]   Defender exclusion active) else (echo [WARN] Defender exclusion missing)
-
-<span class="cc">:: NVIDIA driver version check — UPDATE with your driver version</span>
-for /f "tokens=*" %%a in ('powershell -command "(Get-WmiObject Win32_VideoController | Where-Object {$_.Name -like '*NVIDIA*'}).DriverVersion" 2^>nul') do set DRV=%%a
-if defined DRV (
-    if "!DRV!"=="<span class="ch">YOUR-DRIVER-VERSION</span>" (echo [OK]   NVIDIA driver confirmed: !DRV!) else (echo [WARN] NVIDIA driver changed: !DRV! - re-verify affinity)
-)
-
-<span class="cc">:: Final wuauserv verify</span>
-sc query wuauserv | find "RUNNING" >nul 2>&1
-if %errorlevel%==0 (sc stop wuauserv >nul 2>&1 & echo [WARN] Windows Update restarted - stopped again) else (echo [OK]   Windows Update confirmed stopped)
-
-echo.
-echo ============================================================
-echo   Ready to launch iRacing.
-echo   Run post_iracing_session.bat when done.
-echo ============================================================
-pause</div>
+  <h4>Every session</h4>
+  <div class="steps">
+    <div class="step"><div class="step-body"><strong>Run <code>pre_iracing_launch.bat</code> as Administrator</strong> before you launch iRacing.</div></div>
+    <div class="step"><div class="step-body"><strong>Run <code>post_iracing_session.bat</code> as Administrator</strong> when you're done racing — it restores the services and Defender (see below).</div></div>
   </div>
 
   <h3>Post-Session Restore Script</h3>
@@ -852,7 +791,7 @@ pause</div>
   </div>
 
   <h3>Other NVIDIA GPU Notes</h3>
-  <p>The interrupt affinity approach should work for any NVIDIA GPU, but the number of device instances in the registry varies. Some systems show only one instance, others show two or three. Run the wmic command in Section 05 to find yours. The AssignmentSetOverride bitmask value (8000000000000000 = CPU 7, i.e. 0x80) is a confirmed starting point — use AutoGpuAffinity (github.com/valleyofdoom/AutoGpuAffinity) to benchmark and find the optimal core for your specific system.</p>
+  <p>The interrupt affinity approach should work for any NVIDIA GPU, but the number of device instances in the registry varies. Some systems show only one instance, others show two or three. Run the wmic command in <a class="xref" href="#s5">Section 05</a> to find yours. The AssignmentSetOverride bitmask value (8000000000000000 = CPU 7, i.e. 0x80) is a confirmed starting point — use AutoGpuAffinity (github.com/valleyofdoom/AutoGpuAffinity) to benchmark and find the optimal core for your specific system.</p>
 
   <h3>Single Screen vs Triple Screen</h3>
   <p>The GPU load differences between single and triple screen are significant. All settings in this guide are tuned for triple 2560×1440. Single screen users may be able to run higher settings (MSAA 4x, crowds on) without triggering Type A GPU burst spikes. The CPU-side fixes (services, interrupt affinity, power plan) apply equally to both setups.</p>
@@ -872,24 +811,24 @@ pause</div>
       <li>Install NVIDIA display driver only — custom install, uncheck GFE, PhysX, NVIDIA App</li>
       <li>Uninstall RivaTuner Statistics Server and MSI Afterburner if present</li>
       <li>Disable WiFi adapter in Device Manager if on wired ethernet</li>
-      <li>Add Windows Defender exclusions for iRacing (Section 04)</li>
+      <li>Add Windows Defender exclusions for iRacing (<a class="xref" href="#s4">Section 04</a>)</li>
     </ul>
   </div>
 
   <div class="clg">
     <div class="clg-l">Power &amp; Performance</div>
     <ul class="cl">
-      <li>Create AMD Ryzen Balanced power plan (Section 06) — save the GUID</li>
+      <li>Create AMD Ryzen Balanced power plan (<a class="xref" href="#s6">Section 06</a>) — save the GUID</li>
       <li>Install Process Lasso — enable start with Windows — set AMD Ryzen Balanced as power profile</li>
-      <li>Configure Process Lasso per Section 07 — exclude iRacing sim from ProBalance</li>
+      <li>Configure Process Lasso per <a class="xref" href="#s7">Section 07</a> — exclude iRacing sim from ProBalance</li>
     </ul>
   </div>
 
   <div class="clg">
     <div class="clg-l">NVIDIA Interrupt Affinity</div>
     <ul class="cl">
-      <li>Find all GPU device instances (Section 05 wmic command)</li>
-      <li>Apply interrupt affinity registry fix to all instances (Section 05)</li>
+      <li>Find all GPU device instances (<a class="xref" href="#s5">Section 05</a> wmic command)</li>
+      <li>Apply interrupt affinity registry fix to all instances (<a class="xref" href="#s5">Section 05</a>)</li>
       <li>Reboot and verify with LatencyMon — CPU 7 should show elevated DPC activity, CPU 0 should drop</li>
       <li>Update pre-launch script with your device instance IDs</li>
     </ul>
@@ -898,7 +837,7 @@ pause</div>
   <div class="clg">
     <div class="clg-l">NVIDIA Control Panel</div>
     <ul class="cl">
-      <li>Add iRacingSim64DX11.exe to Program Settings with values from Section 03</li>
+      <li>Add iRacingSim64DX11.exe to Program Settings with values from <a class="xref" href="#s3">Section 03</a></li>
       <li>Confirm all monitors set to maximum Hz</li>
     </ul>
   </div>
@@ -906,8 +845,8 @@ pause</div>
   <div class="clg">
     <div class="clg-l">iRacing Configuration</div>
     <ul class="cl">
-      <li>Apply iRSidekick graphics settings from Section 02</li>
-      <li>Edit app.ini — add texture preload and sound stream keys (Section 02)</li>
+      <li>Apply iRSidekick graphics settings from <a class="xref" href="#s2">Section 02</a></li>
+      <li>Edit app.ini — add texture preload and sound stream keys (<a class="xref" href="#s2">Section 02</a>)</li>
       <li>Frame cap = monitor Hz − 1. C-States disabled in BIOS. EXPO/XMP enabled for RAM.</li>
     </ul>
   </div>
@@ -990,6 +929,8 @@ Remove-MpPreference -ExclusionPath "$env:USERPROFILE\Documents\iRacing"</div>
   Community troubleshooting guide based on real capture data. Results vary by system. Last updated May 2026.
 </footer>
 
+<a href="#" id="toTop" aria-label="Back to top">↑</a>
+
 <script>
 function copyCode(btn) {
   const block = btn.closest('.code-label').nextElementSibling;
@@ -1000,6 +941,47 @@ function copyCode(btn) {
     setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
   });
 }
+
+// Add clickable permalink anchors to every section and subsection heading.
+(function () {
+  function slug(t) {
+    return t.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+  }
+  function addAnchor(el, id) {
+    const a = document.createElement('a');
+    a.className = 'anchor-link';
+    a.href = '#' + id;
+    a.textContent = '#';
+    a.setAttribute('aria-label', 'Permalink to this section');
+    el.appendChild(a);
+  }
+  document.querySelectorAll('.section[id]').forEach(sec => {
+    const title = sec.querySelector('.section-title');
+    if (title) addAnchor(title, sec.id);
+  });
+  document.querySelectorAll('.container h3, .container h4').forEach(h => {
+    if (!h.id) {
+      let base = slug(h.textContent) || 'section';
+      let id = base, n = 2;
+      while (document.getElementById(id)) id = base + '-' + n++;
+      h.id = id;
+    }
+    addAnchor(h, h.id);
+  });
+})();
+
+// Back-to-top button: reveal after scrolling, smooth-scroll up on click.
+(function () {
+  const btn = document.getElementById('toTop');
+  if (!btn) return;
+  const toggle = () => btn.classList.toggle('show', window.scrollY > 600);
+  window.addEventListener('scroll', toggle, { passive: true });
+  toggle();
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
 </script>
 </body>
 </html>
